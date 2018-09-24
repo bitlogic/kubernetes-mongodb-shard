@@ -76,9 +76,9 @@ mongos> sh.status()
 	"clusterId" : ObjectId("575abbcb568388677e5336ef")
 }
   shards:
-	{  "_id" : "rs01",  "host" : "rs01/mongodb-node01.default.svc.cluster.local:27020,mongodb-node02.default.svc.cluster.local:27021" }
-	{  "_id" : "rs02",  "host" : "rs02/mongodb-node01.default.svc.cluster.local:27021,mongodb-node03.default.svc.cluster.local:27020" }
-	{  "_id" : "rs03",  "host" : "rs03/mongodb-node02.default.svc.cluster.local:27020,mongodb-node03.default.svc.cluster.local:27021" }
+	{  "_id" : "rs01",  "host" : "rs01/mongodb-node01:27020,mongodb-node02:27021" }
+	{  "_id" : "rs02",  "host" : "rs02/mongodb-node01:27021,mongodb-node03:27020" }
+	{  "_id" : "rs03",  "host" : "rs03/mongodb-node02:27020,mongodb-node03:27021" }
   active mongoses:
 	"3.2.6" : 3
   balancer:
@@ -255,7 +255,7 @@ spec:
         - "mongos"
         args:
         - "--configdb"
-        - "configReplSet01/mongodb-node01.default.svc.cluster.local:27018,mongodb-node02.default.svc.cluster.local:27018,mongodb-node03.default.svc.cluster.local:27018"
+        - "configReplSet01/mongodb-node01:27018,mongodb-node02:27018,mongodb-node03:27018"
         - "--port"
         - "27017"
         ports:

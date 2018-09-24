@@ -2,11 +2,15 @@
 
 set -eo pipefail
 
+#global vars
+LC_ALL="C"
+K8S_CLI="oc"  # could be kubectl or oc
+
 i=1
 while read p; do
 	NODE=$(printf %02d "${i}")
   	NAME=$(echo $p | cut -d / -f2)
   	echo "Create Deployment on machine ${NAME} (node${NODE})..."
-  	kubectl create -f ./build/node${NODE}-deployment.yaml
+  	$K8S_CLI apply -f ./build/node${NODE}-deployment.yaml
   	i=$((i+1))
 done < ./tmp/nodefile

@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/bash 
+# -x
 
 set -eo pipefail
 
@@ -31,6 +32,8 @@ set -eo pipefail
 # 01230
 
 #global vars
+LC_ALL="C"
+K8S_CLI="oc"  # could be kubectl or oc
 CONFIG_SERVERS_SERVICES=""
 CONFIG_SERVERS_SERVICES_JS=""
 
@@ -122,7 +125,7 @@ function addShard(){
 	if [ "${PREFIX}" = "rsp" ]; then
 		RSNUM=$(echo $1 | cut -b 4-5)
 		NODENUM=$(echo $1 | cut -b 11-12)
-		echo "sh.addShard(\"rs${RSNUM}/mongodb-node${NODENUM}.default.svc.cluster.local:${RSPPORT}\")" \
+		echo "sh.addShard(\"rs${RSNUM}/mongodb-node${NODENUM}:${RSPPORT}\")" \
 			>> ./build/shard-init.js
 	fi
 }
@@ -166,7 +169,7 @@ function genYamlFromTemplates(){
 			> $OUTFILE
 		if [ "$RSID" = "rsp" ]; then
 			OUTFILE="./tmp/js/node${NODENUM}-rs${RSNUM}-pri.js"
-			PRIMARY_SVC_ADDR="mongodb-node${NODENUM}.default.svc.cluster.local:${PORT}"
+			PRIMARY_SVC_ADDR="mongodb-node${NODENUM}:${PORT}"
 			cat "${JS_PATH}/rsXX-pri-template.js" \
 				| sed "s|__PRIMARY_SVC_ADDR__|${PRIMARY_SVC_ADDR}|g" \
 				| sed "/##/d" \
@@ -174,7 +177,7 @@ function genYamlFromTemplates(){
 		fi
 		if [ "$RSID" = "rss" ]; then
 			OUTFILE="./tmp/js/node${NODENUM}-rs${RSNUM}-sec.js"
-			SECONDARY_SVC_ADDR="mongodb-node${NODENUM}.default.svc.cluster.local:${PORT}"
+			SECONDARY_SVC_ADDR="mongodb-node${NODENUM}:${PORT}"
 			cat "${JS_PATH}/rsXX-sec-template.js" \
 				| sed "s|__SECONDARY_SVC_ADDR__|${SECONDARY_SVC_ADDR}|g" \
 				| sed "/##/d" \
@@ -182,7 +185,7 @@ function genYamlFromTemplates(){
 		fi
 		if [ "$RSID" = "arb" ]; then
 			OUTFILE="./tmp/js/node${NODENUM}-rs${RSNUM}-arb.js"
-			ARBITER_SVC_ADDR="mongodb-node${NODENUM}.default.svc.cluster.local:${PORT}"
+			ARBITER_SVC_ADDR="mongodb-node${NODENUM}:${PORT}"
 			cat "${JS_PATH}/rsXX-arb-template.js" \
 				| sed "s|__ARBITER_SVC_ADDR__|${ARBITER_SVC_ADDR}|g" \
 				| sed "/##/d" \
@@ -203,8 +206,8 @@ function genYamlFromTemplates(){
 			| sed "/##/d" \
 			> $OUTFILE
 		ID=$((${NODENUM}-1))
-		CONFIG_SERVERS_SERVICES="${CONFIG_SERVERS_SERVICES},mongodb-node${NODENUM}.default.svc.cluster.local:${PORT}"
-		CONFIG_SERVERS_SERVICES_JS="${CONFIG_SERVERS_SERVICES_JS},\n\t\t{ _id: ${ID}, host: \"mongodb-node${NODENUM}.default.svc.cluster.local:${PORT}\" }"
+		CONFIG_SERVERS_SERVICES="${CONFIG_SERVERS_SERVICES},mongodb-node${NODENUM}:${PORT}"
+		CONFIG_SERVERS_SERVICES_JS="${CONFIG_SERVERS_SERVICES_JS},\n\t\t{ _id: ${ID}, host: \"mongodb-node${NODENUM}:${PORT}\" }"
 	fi
 	if [ "$RSID" = "mg" ]; then
 		RSID=$(echo $1 | cut -b 1-3)
@@ -237,7 +240,7 @@ genFinalFromPartials(){
 	JS_PATH="./tmp/js"
 	TEMPLATE_PATH="./yaml-templates"
 	JS_TEMPLATE_PATH="./js-templates"
-	#cfg01.default.svc.cluster.local:27017,cfg02.default.svc.cluster.local:27017,cfg03.default.svc.cluster.local:27017"
+	#cfg01:27017,cfg02:27017,cfg03:27017"
 	CONFIG_SERVERS_SERVICES=$(echo $CONFIG_SERVERS_SERVICES | cut -b 2-)
 	CONFIG_SERVERS_SERVICES_JS=$(echo $CONFIG_SERVERS_SERVICES_JS | cut -b 4-)
 	for i in $(seq ${CFG_PER_CLUSTER}); do
@@ -277,7 +280,7 @@ genFinalFromPartials(){
 cleanUp
 
 # Gather basic config parameters
-kubectl get nodes| grep -v "SchedulingDisabled" | awk '{print $1}' | tail -n +2 > ./tmp/nodefile
+$K8S_CLI get nodes --show-labels | grep -v "NotReady" | grep -v "SchedulingDisabled" | grep 'env.dev' | awk '{print $1}' | tail -n +1 > ./tmp/nodefile
 getNodeNames "./tmp/nodefile" "./tmp"
 NODES=$(cat ./tmp/nodefile |wc -l)
 
@@ -376,7 +379,7 @@ done
 genFinalFromPartials
 
 echo 'Generate needed directories on remote server ...'
-./src/remote.sh ${SHARDS} ${SSHUSER} ${SSHPORT} ${BASEDIR}
+echo ./src/remote.sh ${SHARDS} ${SSHUSER} ${SSHPORT} ${BASEDIR}
 echo
 echo "Successfully executed."
 echo "Execute 'make run' to fire up the mongodb shard on your cluster."
