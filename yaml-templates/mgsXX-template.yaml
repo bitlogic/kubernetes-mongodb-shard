@@ -7,6 +7,8 @@
         - "configReplSet__MSGNUM__/__CONFIG_SERVERS_SERVICES__"
         - "--port"
         - "__PORT__"
+        securityContext:
+        privileged: true
         ports:
-        - name: __RSID____MSGNUM__-node__NODENUM__
-          containerPort: __PORT__
+          - name: __RSID____MSGNUM__-node__NODENUM__
+            containerPort: __PORT__
