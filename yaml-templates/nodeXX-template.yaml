@@ -13,4 +13,6 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: __NODESELECTOR__
+      serviceAccount: sa-anyuid
+      serviceAccountName: sa-anyuid
       containers:
