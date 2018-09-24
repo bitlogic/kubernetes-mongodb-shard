@@ -9,6 +9,8 @@
         - "__PORT__"
         - "--noprealloc"
         - "--smallfiles"
+        securityContext:
+          privileged: true
         ports:
         - name: __RSID____RSNUM__-node__NODENUM__
           containerPort: __PORT__
