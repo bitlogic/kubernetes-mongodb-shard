@@ -14,4 +14,4 @@
           containerPort: __PORT__
         volumeMounts:
         - name: db-cfg
-          mountPath: /data/db
+          mountPath: /data/configdb
