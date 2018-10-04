@@ -4,7 +4,7 @@ set -eo pipefail
 
 LC_ALL="C"
 NODES=$1 && [ -z "${1}" ] && NODES="3" || true
-MONGO_VER="3.6.7"
+MONGO_VER="3.6.8"
 DATADIR="/usr/local/mongo/data"
 
 echo
