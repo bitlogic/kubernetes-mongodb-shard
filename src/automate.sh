@@ -33,6 +33,6 @@ sleep 15
 echo "Initialize Shard..."
 $K8S_CLI exec -ti ${POD} -c ${CONTAINER} -- mongo --verbose 127.0.0.1:${MONGOSPORT} <./build/shard-init.js
 
-sleep 15
-echo "Initialize database collections for sharding ..."
-$K8S_CLI exec -ti ${POD} -c ${CONTAINER} -- mongo --verbose 127.0.0.1:${MONGOSPORT} <./js-templates/shardkeys.js
+# sleep 15
+# echo "Initialize database collections for sharding ..."
+# $K8S_CLI exec -ti ${POD} -c ${CONTAINER} -- mongo --verbose 127.0.0.1:${MONGOSPORT} <./js-templates/shardkeys.js
