@@ -3,6 +3,7 @@
         args:
         - "--storageEngine"
         - wiredTiger
+        - "--shardsvr"
         - "--replSet"
         - rs__RSNUM__
         - "--port"
